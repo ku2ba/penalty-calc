@@ -182,7 +182,7 @@ export default function App() {
             border: "2px solid #c3a255",
             color: "#000"
           }}>
-            <p><strong>Дней просрочки:</strong> {overdueDays}</p>
+            <p><strong>Дней просрочки1:</strong> {overdueDays}</p>
             {penalty !== null && <p><strong>Неустойка:</strong> {penalty} ₽</p>}
           </div>
         )}
