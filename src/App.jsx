@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { parse, differenceInCalendarDays } from "date-fns";
+import logo from "./assets/logo.jpeg"; // импорт лого
 
 export default function App() {
   const [cost, setCost] = useState("");
@@ -12,7 +13,6 @@ export default function App() {
   const [overdueDays, setOverdueDays] = useState(null);
   const [penalty, setPenalty] = useState(null);
 
-  // Функция расчёта неустойки
   const calculatePenalty = () => {
     const handover = parse(handoverDate, "dd.MM.yyyy", new Date());
     const current = parse(currentDate, "dd.MM.yyyy", new Date());
@@ -20,12 +20,9 @@ export default function App() {
     let days = differenceInCalendarDays(current, handover);
     if (days < 0) days = 0;
 
-    // Исключение периодов моратория
     if (excludeMoratorium) {
-      // Мораторий 1: 29.03.2022 - 30.06.2023
       const moratorium1Start = new Date(2022, 2, 29);
       const moratorium1End = new Date(2023, 5, 30);
-      // Мораторий 2: 22.03.2024 - 31.12.2025
       const moratorium2Start = new Date(2024, 2, 22);
       const moratorium2End = new Date(2025, 11, 31);
 
@@ -36,7 +33,9 @@ export default function App() {
         return diff > 0 ? diff : 0;
       };
 
-      const excludedDays = overlapDays(moratorium1Start, moratorium1End) + overlapDays(moratorium2Start, moratorium2End);
+      const excludedDays =
+        overlapDays(moratorium1Start, moratorium1End) +
+        overlapDays(moratorium2Start, moratorium2End);
       days -= excludedDays;
       if (days < 0) days = 0;
     }
@@ -47,55 +46,84 @@ export default function App() {
     const price = parseFloat(cost);
 
     if (!isNaN(rate) && !isNaN(price) && days > 0) {
-      const multiplier = personType === "Физическое лицо" ? 1 / 300 : 1 / 150;
-      const calcPenalty = price * multiplier * 2 * (rate / 100) * days;
+      const multiplier =
+        personType === "Физическое лицо" ? 1 / 300 : 1 / 150;
+      const calcPenalty =
+        price * multiplier * 2 * (rate / 100) * days;
       setPenalty(calcPenalty.toFixed(2));
     } else {
       setPenalty(null);
     }
   };
 
-  // При сабмите формы всегда пересчитываем
   const handleSubmit = (e) => {
     e.preventDefault();
     calculatePenalty();
   };
 
   return (
-    <div style={{
-      minHeight: "100vh",
-      backgroundColor: "#000",
-      color: "#fff",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      padding: "1rem",
-      fontFamily: "Arial, sans-serif"
-    }}>
-      <div style={{
-        backgroundColor: "#fff",
-        color: "#000",
-        border: "3px solid #c3a255",
-        borderRadius: "12px",
-        maxWidth: "450px",
-        width: "100%",
-        padding: "2rem",
-        boxSizing: "border-box",
-        boxShadow: "0 0 15px #c3a255"
-      }}>
-        <h1 style={{ marginBottom: "1.5rem", textAlign: "center", color: "#c3a255" }}>
+    <div
+      style={{
+        minHeight: "100vh",
+        backgroundColor: "#000",
+        color: "#fff",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: "1rem",
+        fontFamily: "Arial, sans-serif",
+      }}
+    >
+      <div
+        style={{
+          backgroundColor: "#fff",
+          color: "#000",
+          border: "3px solid #c3a255",
+          borderRadius: "12px",
+          maxWidth: "450px",
+          width: "100%",
+          padding: "2rem",
+          boxSizing: "border-box",
+          boxShadow: "0 0 15px #c3a255",
+          textAlign: "center",
+        }}
+      >
+        {/* Аватарка */}
+        <img
+          src={logo}
+          alt="Логотип"
+          style={{
+            width: "120px",
+            height: "120px",
+            borderRadius: "50%",
+            objectFit: "cover",
+            border: "3px solid #c3a255",
+            marginBottom: "1rem",
+          }}
+        />
+
+        <h1 style={{ marginBottom: "1.5rem", color: "#c3a255" }}>
           Расчет неустойки
         </h1>
 
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+        <form
+          onSubmit={handleSubmit}
+          style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+        >
           <label>
             Стоимость объекта (₽)
             <input
               type="number"
               value={cost}
-              onChange={e => setCost(e.target.value)}
+              onChange={(e) => setCost(e.target.value)}
               required
-              style={{ width: "100%", padding: "0.5rem", marginTop: "0.3rem", borderRadius: "5px", border: "1px solid #c3a255" }}
+              style={{
+                width: "100%",
+                padding: "0.5rem",
+                marginTop: "0.3rem",
+                borderRadius: "5px",
+                border: "1px solid #c3a255",
+              }}
             />
           </label>
 
@@ -104,10 +132,16 @@ export default function App() {
             <input
               type="text"
               value={handoverDate}
-              onChange={e => setHandoverDate(e.target.value)}
+              onChange={(e) => setHandoverDate(e.target.value)}
               placeholder="дд.мм.гггг"
               required
-              style={{ width: "100%", padding: "0.5rem", marginTop: "0.3rem", borderRadius: "5px", border: "1px solid #c3a255" }}
+              style={{
+                width: "100%",
+                padding: "0.5rem",
+                marginTop: "0.3rem",
+                borderRadius: "5px",
+                border: "1px solid #c3a255",
+              }}
             />
           </label>
 
@@ -116,10 +150,16 @@ export default function App() {
             <input
               type="text"
               value={currentDate}
-              onChange={e => setCurrentDate(e.target.value)}
+              onChange={(e) => setCurrentDate(e.target.value)}
               placeholder="дд.мм.гггг"
               required
-              style={{ width: "100%", padding: "0.5rem", marginTop: "0.3rem", borderRadius: "5px", border: "1px solid #c3a255" }}
+              style={{
+                width: "100%",
+                padding: "0.5rem",
+                marginTop: "0.3rem",
+                borderRadius: "5px",
+                border: "1px solid #c3a255",
+              }}
             />
           </label>
 
@@ -127,8 +167,14 @@ export default function App() {
             Тип лица
             <select
               value={personType}
-              onChange={e => setPersonType(e.target.value)}
-              style={{ width: "100%", padding: "0.5rem", marginTop: "0.3rem", borderRadius: "5px", border: "1px solid #c3a255" }}
+              onChange={(e) => setPersonType(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "0.5rem",
+                marginTop: "0.3rem",
+                borderRadius: "5px",
+                border: "1px solid #c3a255",
+              }}
             >
               <option>Физическое лицо</option>
               <option>Юридическое лицо</option>
@@ -140,18 +186,31 @@ export default function App() {
             <input
               type="number"
               value={cbrRate}
-              onChange={e => setCbrRate(e.target.value)}
+              onChange={(e) => setCbrRate(e.target.value)}
               step="0.01"
               required
-              style={{ width: "100%", padding: "0.5rem", marginTop: "0.3rem", borderRadius: "5px", border: "1px solid #c3a255" }}
+              style={{
+                width: "100%",
+                padding: "0.5rem",
+                marginTop: "0.3rem",
+                borderRadius: "5px",
+                border: "1px solid #c3a255",
+              }}
             />
           </label>
 
-          <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", userSelect: "none" }}>
+          <label
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              userSelect: "none",
+            }}
+          >
             <input
               type="checkbox"
               checked={excludeMoratorium}
-              onChange={e => setExcludeMoratorium(e.target.checked)}
+              onChange={(e) => setExcludeMoratorium(e.target.checked)}
             />
             Исключить периоды моратория
           </label>
@@ -166,7 +225,7 @@ export default function App() {
               border: "none",
               borderRadius: "6px",
               cursor: "pointer",
-              marginTop: "1rem"
+              marginTop: "1rem",
             }}
           >
             Рассчитать
@@ -174,16 +233,24 @@ export default function App() {
         </form>
 
         {overdueDays !== null && (
-          <div style={{
-            marginTop: "1.5rem",
-            padding: "1rem",
-            backgroundColor: "#f9f9f9",
-            borderRadius: "6px",
-            border: "2px solid #c3a255",
-            color: "#000"
-          }}>
-            <p><strong>Дней просрочки1:</strong> {overdueDays}</p>
-            {penalty !== null && <p><strong>Неустойка:</strong> {penalty} ₽</p>}
+          <div
+            style={{
+              marginTop: "1.5rem",
+              padding: "1rem",
+              backgroundColor: "#f9f9f9",
+              borderRadius: "6px",
+              border: "2px solid #c3a255",
+              color: "#000",
+            }}
+          >
+            <p>
+              <strong>Дней просрочки:</strong> {overdueDays}
+            </p>
+            {penalty !== null && (
+              <p>
+                <strong>Неустойка:</strong> {penalty} ₽
+              </p>
+            )}
           </div>
         )}
       </div>
