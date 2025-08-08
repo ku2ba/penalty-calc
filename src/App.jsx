@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { parse, differenceInCalendarDays } from "date-fns";
-import logo from "./assets/logo.jpeg"; // импорт лого
+import logo from "./assets/logo.jpg"; // импорт лого
 
 export default function App() {
   const [cost, setCost] = useState("");
