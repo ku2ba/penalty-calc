@@ -2,7 +2,12 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'Georgia', serif;
-  background: radial-gradient(circle at top left, #2a2927, #1d1d1b);
+  background: 
+    linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), 
+    url('./assets/fon.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   color: #c5c5c7;
 }
 
