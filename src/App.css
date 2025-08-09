@@ -17,6 +17,7 @@ body {
   justify-content: center;
   align-items: center;
   padding: 1rem;
+  box-sizing: border-box;
 }
 
 .form-wrapper {
@@ -66,6 +67,7 @@ select {
   border: 1px solid #dca434;
   background: #2c2b29;
   color: #fff;
+  box-sizing: border-box;
 }
 
 input::placeholder {
@@ -103,6 +105,7 @@ input::placeholder {
   border: 2px solid #dca434;
   color: #fff;
 }
+
 .small-text {
   font-size: 0.75rem;
   color: #aaa;
@@ -110,3 +113,59 @@ input::placeholder {
   font-weight: normal;
 }
 
+/* Класс для подписи ставки ЦБ — без переноса */
+label.rate-label {
+  white-space: nowrap;
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+/* Адаптивность для мобильных экранов */
+@media (max-width: 480px) {
+  .form-wrapper {
+    max-width: 100%;
+    padding: 1rem;
+    border-width: 1px;
+    border-radius: 8px;
+  }
+
+  .title {
+    font-size: 1.2rem;
+  }
+
+  input,
+  select {
+    font-size: 1rem;
+    padding: 0.4rem;
+  }
+
+  .gold-button {
+    padding: 0.6rem;
+    font-size: 1rem;
+  }
+
+  .logo {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 0.8rem;
+  }
+}
+
+/* Адаптивность для планшетов */
+@media (max-width: 768px) {
+  .form-wrapper {
+    max-width: 90%;
+    padding: 1.5rem;
+  }
+
+  .title {
+    font-size: 1.3rem;
+  }
+}
+
+/* Ограничение ширины формы на больших экранах */
+@media (min-width: 1200px) {
+  .form-wrapper {
+    max-width: 400px;
+  }
+}
