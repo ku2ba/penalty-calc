@@ -57,6 +57,17 @@ function getCbrRateByDate(dateStr) {
     return null;
   }
 }
+const formatDateInput = (value) => {
+  const digits = value.replace(/\D/g, "");
+  let result = "";
+
+  if (digits.length > 0) result += digits.substring(0, 2);
+  if (digits.length >= 3) result += "." + digits.substring(2, 4);
+  if (digits.length >= 5) result += "." + digits.substring(4, 8);
+
+  return result;
+};
+
 
 export default function App() {
   const [cost, setCost] = useState("");
@@ -110,7 +121,7 @@ export default function App() {
 
     setOverdueDays(days);
 
-    const price = parseFloat(cost);
+    const price = parseFloat(cost.replace(/\s/g, ""));
     const rate = typeof cbrRate === "string" ? parseFloat(cbrRate.replace(",", ".")) : cbrRate;
 
     if (!isNaN(price) && rate !== null && !isNaN(rate) && days > 0) {
@@ -137,22 +148,29 @@ export default function App() {
           <label>
             Стоимость объекта (₽)
             <input
-              type="number"
+              type="text"
               value={cost}
-              onChange={(e) => setCost(e.target.value)}
+              onChange={(e) => {
+                const rawValue = e.target.value.replace(/\D/g, ""); // только цифры
+                const formattedValue = rawValue.replace(/\B(?=(\d{3})+(?!\d))/g, " "); // вставляем пробелы между тысячами
+                setCost(formattedValue);
+              }}
               required
             />
           </label>
+
 
           <label>
             Дата передачи квартиры по ДДУ (дд.мм.гггг)
             <input
               type="text"
               value={handoverDate}
-              onChange={(e) => setHandoverDate(e.target.value)}
+              onChange={(e) => setHandoverDate(formatDateInput(e.target.value))}
               placeholder="дд.мм.гггг"
+              maxLength={10}
               required
             />
+
           </label>
 
           <label>
@@ -160,10 +178,12 @@ export default function App() {
             <input
               type="text"
               value={currentDate}
-              onChange={(e) => setCurrentDate(e.target.value)}
+              onChange={(e) => setCurrentDate(formatDateInput(e.target.value))}
               placeholder="дд.мм.гггг"
+              maxLength={10}
               required
             />
+
           </label>
 
           <label>
@@ -175,13 +195,16 @@ export default function App() {
           </label>
 
           {/* Ставка ЦБ теперь отображается автоматически */}
-          <label>
-            Ставка ЦБ (%)
-            <div className="subtitle">Считается автоматически исходя из даты передачи квартиры</div>
-            <div className="rate-display" style={{ marginTop: 6, fontWeight: 700 }}>
+          <label style={{ whiteSpace: "nowrap" }}>
+            Ставка ЦБ (%):&nbsp;
+            <span style={{ fontWeight: 700 }}>
               {cbrRate !== null ? `${cbrRate}%` : "—"}
+            </span>
+            <div className="small-text">
+              Считается автоматически исходя из даты передачи квартиры
             </div>
           </label>
+
 
           <label className="checkbox">
             <input
