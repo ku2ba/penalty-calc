@@ -148,53 +148,59 @@ export default function App() {
           <label>
             Стоимость объекта (₽)
             <input
-              type="text"
+              type="tel"
+              inputMode="numeric"
+              pattern="[0-9]*"
               value={cost}
               onChange={(e) => {
-                const rawValue = e.target.value.replace(/\D/g, ""); // только цифры
-                const formattedValue = rawValue.replace(/\B(?=(\d{3})+(?!\d))/g, " "); // вставляем пробелы между тысячами
+                const rawValue = e.target.value.replace(/\D/g, "");
+                const formattedValue = rawValue.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
                 setCost(formattedValue);
               }}
               required
             />
           </label>
 
-
           <label>
             Дата передачи квартиры по ДДУ (дд.мм.гггг)
             <input
-              type="text"
+              type="tel"
+              inputMode="numeric"
+              pattern="[0-9.]*"
               value={handoverDate}
               onChange={(e) => setHandoverDate(formatDateInput(e.target.value))}
               placeholder="дд.мм.гггг"
               maxLength={10}
               required
             />
-
           </label>
 
           <label>
             Фактическая передача квартиры (дд.мм.гггг)
             <input
-              type="text"
+              type="tel"
+              inputMode="numeric"
+              pattern="[0-9.]*"
               value={currentDate}
               onChange={(e) => setCurrentDate(formatDateInput(e.target.value))}
               placeholder="дд.мм.гггг"
               maxLength={10}
               required
             />
-
           </label>
 
           <label>
             Тип лица
-            <select value={personType} onChange={(e) => setPersonType(e.target.value)}>
+            <select 
+              value={personType} 
+              onChange={(e) => setPersonType(e.target.value)}
+              style={{fontSize: '1rem'}} // Добавляем для единообразия
+            >
               <option>Физическое лицо</option>
               <option>Юридическое лицо</option>
             </select>
           </label>
 
-          {/* Ставка ЦБ теперь отображается автоматически */}
           <label style={{ whiteSpace: "nowrap" }}>
             Ставка ЦБ (%):&nbsp;
             <span style={{ fontWeight: 700 }}>
@@ -205,15 +211,26 @@ export default function App() {
             </div>
           </label>
 
-
-          <label className="checkbox">
+          <div className="checkbox-container">
             <input
               type="checkbox"
+              id="moratorium-checkbox"
               checked={excludeMoratorium}
               onChange={(e) => setExcludeMoratorium(e.target.checked)}
+              style={{
+                width: '18px',
+                height: '18px',
+                marginRight: '8px',
+                cursor: 'pointer'
+              }}
             />
-            Исключить периоды моратория
-          </label>
+            <label 
+              htmlFor="moratorium-checkbox"
+              style={{cursor: 'pointer'}}
+            >
+              Исключить периоды моратория
+            </label>
+          </div>
 
           <button type="submit" className="gold-button">
             Рассчитать
