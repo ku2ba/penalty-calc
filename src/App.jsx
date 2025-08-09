@@ -3,11 +3,6 @@ import { parse, differenceInCalendarDays } from "date-fns";
 import logo from "./assets/logo.jpg";
 import "./App.css";
 
-/**
- * История ключевой ставки ЦБ РФ (примерная, 2020 — середина 2025).
- * Формат дат: "YYYY-MM-DD". Поле `to: null` означает "до настоящего".
- * (Если нужно — мы позже уточним и дополним даты/значения.)
- */
 const cbrRateHistory = [
   { from: "2025-07-25", to: null, rate: 18 },
   { from: "2025-06-06", to: "2025-07-24", rate: 20 },
@@ -35,13 +30,11 @@ const cbrRateHistory = [
   { from: "2020-02-10", to: "2020-04-09", rate: 6 },
 ];
 
-/** Парсер ISO-строки "YYYY-MM-DD" -> Date (локально, без врем.зон) */
 function parseISODate(iso) {
   const [y, m, d] = iso.split("-").map(Number);
   return new Date(y, m - 1, d);
 }
 
-/** Получить ставку по дате в формате "dd.MM.yyyy" */
 function getCbrRateByDate(dateStr) {
   try {
     const [dd, mm, yyyy] = dateStr.split(".");
@@ -57,6 +50,7 @@ function getCbrRateByDate(dateStr) {
     return null;
   }
 }
+
 const formatDateInput = (value) => {
   const digits = value.replace(/\D/g, "");
   let result = "";
@@ -68,19 +62,17 @@ const formatDateInput = (value) => {
   return result;
 };
 
-
 export default function App() {
   const [cost, setCost] = useState("");
   const [handoverDate, setHandoverDate] = useState("");
   const [currentDate, setCurrentDate] = useState("");
   const [personType, setPersonType] = useState("Физическое лицо");
-  const [cbrRate, setCbrRate] = useState(null); // число или null
+  const [cbrRate, setCbrRate] = useState(null);
   const [excludeMoratorium, setExcludeMoratorium] = useState(false);
-
   const [overdueDays, setOverdueDays] = useState(null);
   const [penalty, setPenalty] = useState(null);
+  const [error, setError] = useState("");
 
-  // Автоподбор ставки при изменении даты передачи (формат dd.MM.yyyy)
   useEffect(() => {
     if (handoverDate.match(/^\d{2}\.\d{2}\.\d{4}$/)) {
       const rate = getCbrRateByDate(handoverDate);
@@ -90,15 +82,35 @@ export default function App() {
     }
   }, [handoverDate]);
 
+  const validateInputs = () => {
+    if (!cost || isNaN(Number(cost.replace(/\s/g, "")))) {
+      setError("Введите корректную стоимость объекта");
+      return false;
+    }
+
+    if (!handoverDate.match(/^\d{2}\.\d{2}\.\d{4}$/)) {
+      setError("Введите дату передачи в формате дд.мм.гггг");
+      return false;
+    }
+
+    if (!currentDate.match(/^\d{2}\.\d{2}\.\d{4}$/)) {
+      setError("Введите фактическую дату в формате дд.мм.гггг");
+      return false;
+    }
+
+    setError("");
+    return true;
+  };
+
   const calculatePenalty = () => {
-    // Парсим даты форматом dd.MM.yyyy
+    if (!validateInputs()) return;
+
     const handover = parse(handoverDate, "dd.MM.yyyy", new Date());
     const current = parse(currentDate, "dd.MM.yyyy", new Date());
 
     let days = differenceInCalendarDays(current, handover);
     if (days < 0) days = 0;
 
-    // Вычитаем периоды моратория, если опция включена
     if (excludeMoratorium) {
       const moratorium1Start = new Date(2022, 2, 29);
       const moratorium1End = new Date(2023, 5, 30);
@@ -122,7 +134,7 @@ export default function App() {
     setOverdueDays(days);
 
     const price = parseFloat(cost.replace(/\s/g, ""));
-    const rate = typeof cbrRate === "string" ? parseFloat(cbrRate.replace(",", ".")) : cbrRate;
+    const rate = cbrRate;
 
     if (!isNaN(price) && rate !== null && !isNaN(rate) && days > 0) {
       const multiplier = personType === "Физическое лицо" ? 1 / 300 : 1 / 150;
@@ -144,6 +156,8 @@ export default function App() {
         <img src={logo} alt="Логотип" className="logo" />
         <h1 className="title">Расчет неустойки</h1>
 
+        {error && <div style={{color: "red", marginBottom: "1rem"}}>{error}</div>}
+
         <form onSubmit={handleSubmit} className="form">
           <label>
             Стоимость объекта (₽)
@@ -153,7 +167,7 @@ export default function App() {
               pattern="[0-9]*"
               value={cost}
               onChange={(e) => {
-                const rawValue = e.target.value.replace(/\D/g, "");
+                const rawValue = e.target.value.replace(/[^\d]/g, "");
                 const formattedValue = rawValue.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
                 setCost(formattedValue);
               }}
@@ -194,7 +208,7 @@ export default function App() {
             <select 
               value={personType} 
               onChange={(e) => setPersonType(e.target.value)}
-              style={{fontSize: '1rem'}} // Добавляем для единообразия
+              style={{fontSize: '1rem'}}
             >
               <option>Физическое лицо</option>
               <option>Юридическое лицо</option>
@@ -211,22 +225,22 @@ export default function App() {
             </div>
           </label>
 
-          <div className="checkbox-container">
+          <div style={{display: 'flex', alignItems: 'center', margin: '1rem 0'}}>
             <input
               type="checkbox"
-              id="moratorium-checkbox"
+              id="excludeMoratorium"
               checked={excludeMoratorium}
               onChange={(e) => setExcludeMoratorium(e.target.checked)}
               style={{
-                width: '18px',
-                height: '18px',
-                marginRight: '8px',
+                width: '20px',
+                height: '20px',
+                marginRight: '10px',
                 cursor: 'pointer'
               }}
             />
             <label 
-              htmlFor="moratorium-checkbox"
-              style={{cursor: 'pointer'}}
+              htmlFor="excludeMoratorium"
+              style={{cursor: 'pointer', userSelect: 'none'}}
             >
               Исключить периоды моратория
             </label>
@@ -244,7 +258,7 @@ export default function App() {
             </p>
             {penalty !== null && (
               <p>
-                <strong>Неустойка:</strong> {penalty} ₽
+                <strong>Неустойка:</strong> {parseFloat(penalty).toLocaleString('ru-RU')} ₽
               </p>
             )}
           </div>
