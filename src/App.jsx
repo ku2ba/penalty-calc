@@ -91,7 +91,7 @@ export default function App() {
           </label>
 
           <label>
-            Текущая дата (дд.мм.гггг)
+            Фактическая передача квартиры (дд.мм.гггг)
             <input
               type="text"
               value={currentDate}
