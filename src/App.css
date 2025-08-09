@@ -9,6 +9,12 @@ body {
   background-position: center;
   background-repeat: no-repeat;
   color: #c5c5c7;
+  -webkit-text-size-adjust: 100%; /* Чтобы шрифты не масштабировались браузером */
+  box-sizing: border-box;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
 }
 
 .app-container {
@@ -18,6 +24,7 @@ body {
   align-items: center;
   padding: 1rem;
   box-sizing: border-box;
+  width: 100%;
 }
 
 .form-wrapper {
@@ -28,6 +35,8 @@ body {
   max-width: 450px;
   width: 100%;
   box-shadow: 0 0 20px rgba(220, 164, 52, 0.5);
+  box-sizing: border-box;
+  overflow-wrap: break-word;
 }
 
 /* Центрируем только лого и заголовок */
@@ -40,6 +49,8 @@ body {
   object-fit: cover;
   border: 3px solid #dca434;
   box-shadow: 0 0 15px rgba(220, 164, 52, 0.4);
+  max-width: 100%;
+  height: auto;
 }
 
 .title {
@@ -48,6 +59,8 @@ body {
   text-align: center;
   font-size: 1.5rem; /* размер шрифта */
   font-weight: normal; /* обычная толщина */
+  word-break: break-word;
+  max-width: 100%;
 }
 
 /* Форма и подписи — влево */
@@ -56,6 +69,8 @@ body {
   flex-direction: column;
   gap: 1rem;
   text-align: left;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 input,
@@ -67,11 +82,14 @@ select {
   border: 1px solid #dca434;
   background: #2c2b29;
   color: #fff;
+  font-size: 1rem;
   box-sizing: border-box;
+  word-break: break-word;
 }
 
 input::placeholder {
   color: #aaa;
+  font-size: 0.9rem;
 }
 
 .checkbox {
@@ -91,6 +109,9 @@ input::placeholder {
   cursor: pointer;
   margin-top: 1rem;
   transition: background-color 0.3s;
+  font-size: 1.1rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .gold-button:hover {
@@ -104,6 +125,7 @@ input::placeholder {
   border-radius: 6px;
   border: 2px solid #dca434;
   color: #fff;
+  word-break: break-word;
 }
 
 .small-text {
@@ -111,16 +133,19 @@ input::placeholder {
   color: #aaa;
   margin-top: 2px;
   font-weight: normal;
+  word-break: break-word;
 }
 
-/* Класс для подписи ставки ЦБ — без переноса */
 label.rate-label {
   white-space: nowrap;
   display: block;
   margin-bottom: 0.2rem;
+  font-size: 1rem;
+  color: #c5c5c7;
+  word-break: normal;
 }
 
-/* Адаптивность для мобильных экранов */
+/* Мобильные экраны (ширина <= 480px) */
 @media (max-width: 480px) {
   .form-wrapper {
     max-width: 100%;
@@ -135,13 +160,13 @@ label.rate-label {
 
   input,
   select {
-    font-size: 1rem;
-    padding: 0.4rem;
+    font-size: 1.1rem;
+    padding: 0.5rem;
   }
 
   .gold-button {
     padding: 0.6rem;
-    font-size: 1rem;
+    font-size: 1.1rem;
   }
 
   .logo {
@@ -151,7 +176,7 @@ label.rate-label {
   }
 }
 
-/* Адаптивность для планшетов */
+/* Планшеты (ширина <= 768px) */
 @media (max-width: 768px) {
   .form-wrapper {
     max-width: 90%;
@@ -163,7 +188,7 @@ label.rate-label {
   }
 }
 
-/* Ограничение ширины формы на больших экранах */
+/* Большие экраны (ширина >= 1200px) */
 @media (min-width: 1200px) {
   .form-wrapper {
     max-width: 400px;
