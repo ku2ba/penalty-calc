@@ -224,3 +224,20 @@ input::placeholder {
     font-size: 1.2rem;
   }
 }
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  margin: 1rem 0;
+}
+
+.checkbox-container label {
+  cursor: pointer;
+  user-select: none;
+}
+
+@media (max-width: 480px) {
+  .checkbox-container input[type="checkbox"] {
+    transform: scale(1.2);
+    margin-right: 10px;
+  }
+}
