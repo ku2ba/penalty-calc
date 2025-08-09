@@ -103,3 +103,10 @@ input::placeholder {
   border: 2px solid #dca434;
   color: #fff;
 }
+.small-text {
+  font-size: 0.75rem;
+  color: #aaa;
+  margin-top: 2px;
+  font-weight: normal;
+}
+
