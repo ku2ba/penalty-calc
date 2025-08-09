@@ -3,6 +3,11 @@ import { parse, differenceInCalendarDays } from "date-fns";
 import logo from "./assets/logo.jpg";
 import "./App.css";
 
+/**
+ * История ключевой ставки ЦБ РФ (примерная, 2020 — середина 2025).
+ * Формат дат: "YYYY-MM-DD". Поле to: null означает "до настоящего".
+ * (Если нужно — мы позже уточним и дополним даты/значения.)
+ */
 const cbrRateHistory = [
   { from: "2025-07-25", to: null, rate: 18 },
   { from: "2025-06-06", to: "2025-07-24", rate: 20 },
@@ -30,11 +35,13 @@ const cbrRateHistory = [
   { from: "2020-02-10", to: "2020-04-09", rate: 6 },
 ];
 
+/** Парсер ISO-строки "YYYY-MM-DD" -> Date (локально, без врем.зон) */
 function parseISODate(iso) {
   const [y, m, d] = iso.split("-").map(Number);
   return new Date(y, m - 1, d);
 }
 
+/** Получить ставку по дате в формате "dd.MM.yyyy" */
 function getCbrRateByDate(dateStr) {
   try {
     const [dd, mm, yyyy] = dateStr.split(".");
@@ -51,28 +58,18 @@ function getCbrRateByDate(dateStr) {
   }
 }
 
-const formatDateInput = (value) => {
-  const digits = value.replace(/\D/g, "");
-  let result = "";
-
-  if (digits.length > 0) result += digits.substring(0, 2);
-  if (digits.length >= 3) result += "." + digits.substring(2, 4);
-  if (digits.length >= 5) result += "." + digits.substring(4, 8);
-
-  return result;
-};
-
 export default function App() {
   const [cost, setCost] = useState("");
   const [handoverDate, setHandoverDate] = useState("");
   const [currentDate, setCurrentDate] = useState("");
   const [personType, setPersonType] = useState("Физическое лицо");
-  const [cbrRate, setCbrRate] = useState(null);
+  const [cbrRate, setCbrRate] = useState(null); // число или null
   const [excludeMoratorium, setExcludeMoratorium] = useState(false);
+
   const [overdueDays, setOverdueDays] = useState(null);
   const [penalty, setPenalty] = useState(null);
-  const [error, setError] = useState("");
 
+  // Автоподбор ставки при изменении даты передачи (формат dd.MM.yyyy)
   useEffect(() => {
     if (handoverDate.match(/^\d{2}\.\d{2}\.\d{4}$/)) {
       const rate = getCbrRateByDate(handoverDate);
@@ -82,35 +79,15 @@ export default function App() {
     }
   }, [handoverDate]);
 
-  const validateInputs = () => {
-    if (!cost || isNaN(Number(cost.replace(/\s/g, "")))) {
-      setError("Введите корректную стоимость объекта");
-      return false;
-    }
-
-    if (!handoverDate.match(/^\d{2}\.\d{2}\.\d{4}$/)) {
-      setError("Введите дату передачи в формате дд.мм.гггг");
-      return false;
-    }
-
-    if (!currentDate.match(/^\d{2}\.\d{2}\.\d{4}$/)) {
-      setError("Введите фактическую дату в формате дд.мм.гггг");
-      return false;
-    }
-
-    setError("");
-    return true;
-  };
-
   const calculatePenalty = () => {
-    if (!validateInputs()) return;
-
+    // Парсим даты форматом dd.MM.yyyy
     const handover = parse(handoverDate, "dd.MM.yyyy", new Date());
     const current = parse(currentDate, "dd.MM.yyyy", new Date());
 
     let days = differenceInCalendarDays(current, handover);
     if (days < 0) days = 0;
 
+    // Вычитаем периоды моратория, если опция включена
     if (excludeMoratorium) {
       const moratorium1Start = new Date(2022, 2, 29);
       const moratorium1End = new Date(2023, 5, 30);
@@ -133,8 +110,8 @@ export default function App() {
 
     setOverdueDays(days);
 
-    const price = parseFloat(cost.replace(/\s/g, ""));
-    const rate = cbrRate;
+    const price = parseFloat(cost);
+    const rate = typeof cbrRate === "string" ? parseFloat(cbrRate.replace(",", ".")) : cbrRate;
 
     if (!isNaN(price) && rate !== null && !isNaN(rate) && days > 0) {
       const multiplier = personType === "Физическое лицо" ? 1 / 300 : 1 / 150;
@@ -156,21 +133,13 @@ export default function App() {
         <img src={logo} alt="Логотип" className="logo" />
         <h1 className="title">Расчет неустойки</h1>
 
-        {error && <div style={{color: "red", marginBottom: "1rem"}}>{error}</div>}
-
         <form onSubmit={handleSubmit} className="form">
           <label>
             Стоимость объекта (₽)
             <input
-              type="tel"
-              inputMode="numeric"
-              pattern="[0-9]*"
+              type="number"
               value={cost}
-              onChange={(e) => {
-                const rawValue = e.target.value.replace(/[^\d]/g, "");
-                const formattedValue = rawValue.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
-                setCost(formattedValue);
-              }}
+              onChange={(e) => setCost(e.target.value)}
               required
             />
           </label>
@@ -178,13 +147,10 @@ export default function App() {
           <label>
             Дата передачи квартиры по ДДУ (дд.мм.гггг)
             <input
-              type="tel"
-              inputMode="numeric"
-              pattern="[0-9.]*"
+              type="text"
               value={handoverDate}
-              onChange={(e) => setHandoverDate(formatDateInput(e.target.value))}
+              onChange={(e) => setHandoverDate(e.target.value)}
               placeholder="дд.мм.гггг"
-              maxLength={10}
               required
             />
           </label>
@@ -192,59 +158,39 @@ export default function App() {
           <label>
             Фактическая передача квартиры (дд.мм.гггг)
             <input
-              type="tel"
-              inputMode="numeric"
-              pattern="[0-9.]*"
+              type="text"
               value={currentDate}
-              onChange={(e) => setCurrentDate(formatDateInput(e.target.value))}
+              onChange={(e) => setCurrentDate(e.target.value)}
               placeholder="дд.мм.гггг"
-              maxLength={10}
               required
             />
           </label>
 
           <label>
             Тип лица
-            <select 
-              value={personType} 
-              onChange={(e) => setPersonType(e.target.value)}
-              style={{fontSize: '1rem'}}
-            >
+            <select value={personType} onChange={(e) => setPersonType(e.target.value)}>
               <option>Физическое лицо</option>
               <option>Юридическое лицо</option>
             </select>
           </label>
 
-          <label style={{ whiteSpace: "nowrap" }}>
-            Ставка ЦБ (%):&nbsp;
-            <span style={{ fontWeight: 700 }}>
-              {cbrRate !== null ? `${cbrRate}%` : "—"}
-            </span>
-            <div className="small-text">
-              Считается автоматически исходя из даты передачи квартиры
+          {/* Ставка ЦБ теперь отображается автоматически */}
+          <label>
+            Ставка ЦБ (%)
+            <div className="subtitle">Считается автоматически исходя из даты передачи квартиры</div>
+            <div className="rate-display" style={{ marginTop: 6, fontWeight: 700 }}>
+              {cbrRate !== null ? ${cbrRate}% : "—"}
             </div>
           </label>
 
-          <div style={{display: 'flex', alignItems: 'center', margin: '1rem 0'}}>
+          <label className="checkbox">
             <input
               type="checkbox"
-              id="excludeMoratorium"
               checked={excludeMoratorium}
               onChange={(e) => setExcludeMoratorium(e.target.checked)}
-              style={{
-                width: '20px',
-                height: '20px',
-                marginRight: '10px',
-                cursor: 'pointer'
-              }}
             />
-            <label 
-              htmlFor="excludeMoratorium"
-              style={{cursor: 'pointer', userSelect: 'none'}}
-            >
-              Исключить периоды моратория
-            </label>
-          </div>
+            Исключить периоды моратория
+          </label>
 
           <button type="submit" className="gold-button">
             Рассчитать
@@ -258,7 +204,7 @@ export default function App() {
             </p>
             {penalty !== null && (
               <p>
-                <strong>Неустойка:</strong> {parseFloat(penalty).toLocaleString('ru-RU')} ₽
+                <strong>Неустойка:</strong> {penalty} ₽
               </p>
             )}
           </div>
