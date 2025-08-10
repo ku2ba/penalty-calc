@@ -167,6 +167,10 @@ input::placeholder {
   color: #aaa;
   margin-top: 0.5rem;
   line-height: 1.4;
+  word-wrap: break-word; /* чтобы слова переносились при необходимости */
+  overflow-wrap: break-word;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .checkbox-container {
