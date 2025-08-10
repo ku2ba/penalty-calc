@@ -57,6 +57,17 @@ function getCbrRateByDate(dateStr) {
     return null;
   }
 }
+const formatDateInput = (value) => {
+  const digits = value.replace(/\D/g, "");
+  let result = "";
+
+  if (digits.length > 0) result += digits.substring(0, 2);
+  if (digits.length >= 3) result += "." + digits.substring(2, 4);
+  if (digits.length >= 5) result += "." + digits.substring(4, 8);
+
+  return result;
+};
+
 
 export default function App() {
   const [cost, setCost] = useState("");
@@ -155,23 +166,29 @@ export default function App() {
           <label>
             Дата передачи квартиры по ДДУ (дд.мм.гггг)
             <input
-              type="text"
+              type="tel"
+              inputMode="numeric"
               value={handoverDate}
-              onChange={(e) => setHandoverDate(e.target.value)}
+              onChange={(e) => setHandoverDate(formatDateInput(e.target.value))}
               placeholder="дд.мм.гггг"
+              maxLength={10}
               required
             />
+
           </label>
 
           <label>
             Фактическая передача квартиры (дд.мм.гггг)
             <input
-              type="text"
+              type="tel"
+              inputMode="numeric"
               value={currentDate}
-              onChange={(e) => setCurrentDate(e.target.value)}
+              onChange={(e) => setCurrentDate(formatDateInput(e.target.value))}
               placeholder="дд.мм.гггг"
+              maxLength={10}
               required
             />
+
           </label>
 
           <label>
