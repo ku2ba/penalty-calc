@@ -137,12 +137,19 @@ export default function App() {
           <label>
             Стоимость объекта (₽)
             <input
-              type="number"
+              type="text"
               value={cost}
-              onChange={(e) => setCost(e.target.value)}
+              onChange={(e) => {
+                // Убираем все нецифры, кроме запятой и точки (если нужны)
+                const rawValue = e.target.value.replace(/\D/g, "");
+                // Форматируем с пробелами по тысячам
+                const formattedValue = rawValue.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+                setCost(formattedValue);
+              }}
               required
             />
           </label>
+
 
           <label>
             Дата передачи квартиры по ДДУ (дд.мм.гггг)
