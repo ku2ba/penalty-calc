@@ -138,18 +138,18 @@ export default function App() {
           <label>
             Стоимость объекта (₽)
             <input
-              type="text"
+              type="tel"
+              inputMode="numeric"
               value={cost}
               onChange={(e) => {
-                // Убираем все нецифры, кроме запятой и точки (если нужны)
-                const rawValue = e.target.value.replace(/\D/g, "");
-                // Форматируем с пробелами по тысячам
+                const rawValue = e.target.value.replace(/\D/g, ""); // только цифры
                 const formattedValue = rawValue.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
                 setCost(formattedValue);
               }}
               required
             />
           </label>
+
 
 
           <label>
