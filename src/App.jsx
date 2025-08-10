@@ -179,7 +179,7 @@ export default function App() {
             Ставка ЦБ (%)
             <div className="subtitle">Считается автоматически исходя из даты передачи квартиры</div>
             <div className="rate-display" style={{ marginTop: 6, fontWeight: 700 }}>
-              {cbrRate !== null ? $:cbrRate}% : "—"}
+              {cbrRate !== null ? ${cbrRate}% : ":"}
             </div>
           </label>
 
