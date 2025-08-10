@@ -44,7 +44,7 @@ body {
   box-sizing: border-box;
   margin: 1rem;
   word-break: break-word; /* принудительный перенос длинных слов */
-  font-size: 0.85rem;
+  font-size: 0.65rem;
 }
 
 .logo {
