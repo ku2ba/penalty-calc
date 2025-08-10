@@ -232,7 +232,7 @@ export default function App() {
             </p>
             {penalty !== null && (
               <p>
-                <strong>Неустойка:</strong> {Number(penalty).toLocaleString("ru-RU")} ₽
+                <strong>Неустойка:</strong> {Number(penalty).toLocaleString("ru-RU")} руб.
               </p>
             )}
           </div>
