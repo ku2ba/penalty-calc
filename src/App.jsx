@@ -175,13 +175,16 @@ export default function App() {
           </label>
 
           {/* Ставка ЦБ теперь отображается автоматически */}
-          <label>
-            Ставка ЦБ (%)
-            <div className="subtitle">Считается автоматически исходя из даты передачи квартиры</div>
-            <div className="rate-display" style={{ marginTop: 6, fontWeight: 700 }}>
-              {cbrRate !== null ? ${cbrRate}% : ":"}
+          <label style={{ whiteSpace: "nowrap" }}>
+            Ставка ЦБ (%):&nbsp;
+            <span style={{ fontWeight: 700 }}>
+              {cbrRate !== null ? `${cbrRate}%` : "—"}
+            </span>
+            <div className="small-text">
+              Считается автоматически исходя из даты передачи квартиры
             </div>
           </label>
+
 
           <label className="checkbox">
             <input
