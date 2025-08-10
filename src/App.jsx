@@ -110,7 +110,8 @@ export default function App() {
 
     setOverdueDays(days);
 
-    const price = parseFloat(cost);
+    const price = parseFloat(cost.replace(/\s/g, ""));
+
     const rate = typeof cbrRate === "string" ? parseFloat(cbrRate.replace(",", ".")) : cbrRate;
 
     if (!isNaN(price) && rate !== null && !isNaN(rate) && days > 0) {
