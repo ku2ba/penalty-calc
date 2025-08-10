@@ -225,7 +225,7 @@ export default function App() {
           </button>
         </form>
 
-        {overdueDays !== null && (
+         {overdueDays !== null && (
           <div className="result">
             <p>
               <strong>Дней просрочки:</strong> {overdueDays}
@@ -240,3 +240,4 @@ export default function App() {
       </div>
     </div>
   );
+}
