@@ -206,7 +206,7 @@ export default function App() {
               {cbrRate !== null ? `${cbrRate}%` : "—"}
             </span>
             <div className="small-text">
-              Считается автоматически исходя из даты передачи квартиры
+              Считается автоматически исходя из даты в ДДУ
             </div>
           </label>
 
