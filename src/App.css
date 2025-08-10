@@ -43,6 +43,7 @@ body {
   box-shadow: 0 0 20px rgba(220, 164, 52, 0.5);
   box-sizing: border-box;
   margin: 1rem;
+  word-break: break-word; /* принудительный перенос длинных слов */
 }
 
 .logo {
