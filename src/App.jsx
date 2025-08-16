@@ -243,7 +243,10 @@ export default function App() {
             Исключить периоды моратория
           </label>
 
-          <p className="moratorium-hint" style={{ display: (/* логика */) ? "block" : "none" }}>
+          <p
+            className="moratorium-hint"
+            style={{ display: showMoratoriumHint ? "block" : "none" }}
+          >
             Сроки попадают под мораторий, но не расстраивайтесь, возможно условия вашего договора позволяют взыскать с застройщика несмотря на мораторий
           </p>
 
