@@ -185,6 +185,40 @@ input::placeholder {
   cursor: pointer;
   user-select: none;
 }
+  .moratorium-hint {
+  margin-top: 0.75rem;
+  font-size: 0.95rem;
+  color: #ffd37a;
+  background: rgba(220, 164, 52, 0.15);
+  border-left: 3px solid #dca434;
+  padding: 0.6rem 0.75rem;
+  border-radius: 6px;
+}
+  .btn-link {
+  display: inline-block;
+  text-align: center;
+  background-color: #dca434;
+  color: #1d1d1b !important;   /* жёстко задаём цвет текста */
+  font-weight: bold;
+  padding: 0.9rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: all 0.3s;
+  font-size: 1.1rem;
+  width: 100%;
+  text-decoration: none;       /* убираем подчёркивание */
+  font-family: 'Georgia', serif;
+}
+  .btn-link:hover {
+  background-color: #b98a30;
+  color: #1d1d1b !important;   /* при ховере тоже остаётся чёрный */
+}
+.btn-link:active {
+  transform: scale(0.98);
+  color: #1d1d1b !important;   /* при клике тоже */
+}
 
 /* Мобильная адаптация */
 @media (max-width: 480px) {
