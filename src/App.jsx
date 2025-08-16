@@ -6,7 +6,6 @@ import "./App.css";
 /**
  * История ключевой ставки ЦБ РФ (примерная, 2020 — середина 2025).
  * Формат дат: "YYYY-MM-DD". Поле to: null означает "до настоящего".
- * (Если нужно — мы позже уточним и дополним даты/значения.)
  */
 const cbrRateHistory = [
   { from: "2025-07-25", to: null, rate: 18 },
@@ -57,6 +56,7 @@ function getCbrRateByDate(dateStr) {
     return null;
   }
 }
+
 const formatDateInput = (value) => {
   const digits = value.replace(/\D/g, "");
   let result = "";
@@ -68,6 +68,21 @@ const formatDateInput = (value) => {
   return result;
 };
 
+// -------------------- МОРОТОРИЙ --------------------
+const MORATORIUMS = [
+  { start: new Date(2022, 2, 29), end: new Date(2023, 5, 30) },
+  { start: new Date(2024, 2, 22), end: new Date(2025, 11, 31) },
+];
+
+const hasMoratoriumOverlap = (handover, current) => {
+  for (const period of MORATORIUMS) {
+    const overlapStart = handover > period.start ? handover : period.start;
+    const overlapEnd = current < period.end ? current : period.end;
+    if (differenceInCalendarDays(overlapEnd, overlapStart) > 0) return true;
+  }
+  return false;
+};
+// ------------------------------------------------------
 
 export default function App() {
   const [cost, setCost] = useState("");
@@ -79,6 +94,7 @@ export default function App() {
 
   const [overdueDays, setOverdueDays] = useState(null);
   const [penalty, setPenalty] = useState(null);
+  const [showMoratoriumHint, setShowMoratoriumHint] = useState(false);
 
   // Автоподбор ставки при изменении даты передачи (формат dd.MM.yyyy)
   useEffect(() => {
@@ -90,21 +106,29 @@ export default function App() {
     }
   }, [handoverDate]);
 
+  // Проверка для подсказки о моратории
+  useEffect(() => {
+    const handover = parse(handoverDate, "dd.MM.yyyy", new Date());
+    const current = parse(currentDate, "dd.MM.yyyy", new Date());
+
+    if (
+      handoverDate.match(/^\d{2}\.\d{2}\.\d{4}$/) &&
+      currentDate.match(/^\d{2}\.\d{2}\.\d{4}$/)
+    ) {
+      setShowMoratoriumHint(hasMoratoriumOverlap(handover, current));
+    } else {
+      setShowMoratoriumHint(false);
+    }
+  }, [handoverDate, currentDate]);
+
   const calculatePenalty = () => {
-    // Парсим даты форматом dd.MM.yyyy
     const handover = parse(handoverDate, "dd.MM.yyyy", new Date());
     const current = parse(currentDate, "dd.MM.yyyy", new Date());
 
     let days = differenceInCalendarDays(current, handover);
     if (days < 0) days = 0;
 
-    // Вычитаем периоды моратория, если опция включена
     if (excludeMoratorium) {
-      const moratorium1Start = new Date(2022, 2, 29);
-      const moratorium1End = new Date(2023, 5, 30);
-      const moratorium2Start = new Date(2024, 2, 22);
-      const moratorium2End = new Date(2025, 11, 31);
-
       const overlapDays = (start, end) => {
         const overlapStart = handover > start ? handover : start;
         const overlapEnd = current < end ? current : end;
@@ -113,8 +137,8 @@ export default function App() {
       };
 
       const excludedDays =
-        overlapDays(moratorium1Start, moratorium1End) +
-        overlapDays(moratorium2Start, moratorium2End);
+        overlapDays(MORATORIUMS[0].start, MORATORIUMS[0].end) +
+        overlapDays(MORATORIUMS[1].start, MORATORIUMS[1].end);
       days -= excludedDays;
       if (days < 0) days = 0;
     }
@@ -122,7 +146,6 @@ export default function App() {
     setOverdueDays(days);
 
     const price = parseFloat(cost.replace(/\s/g, ""));
-
     const rate = typeof cbrRate === "string" ? parseFloat(cbrRate.replace(",", ".")) : cbrRate;
 
     if (!isNaN(price) && rate !== null && !isNaN(rate) && days > 0) {
@@ -220,9 +243,14 @@ export default function App() {
             Исключить периоды моратория
           </label>
 
+          <p className="moratorium-hint" style={{ display: (/* логика */) ? "block" : "none" }}>
+            Сроки попадают под мораторий, но не расстраивайтесь, возможно условия вашего договора позволяют взыскать с застройщика несмотря на мораторий
+          </p>
+
           <button type="submit" className="gold-button">
             Рассчитать
           </button>
+          <a href="https://t.me/listevpnbot?start=personal" class="btn-link">Персональное предложение</a>
         </form>
 
          {overdueDays !== null && (
